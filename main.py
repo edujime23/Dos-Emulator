@@ -1,15 +1,38 @@
 
+import io
 import os
+import typing
 class File:
   def __init__(self, filename, parent):
     self.filename = filename
     self.parent = parent
+    self.file = io.TextIOWrapper(io.BytesIO(),"utf-8")
+
+  def open(self, mode : str, data):
     
+    def read():
+      return self.file.read()
+
+    def write(data):
+      self.file.write(data)
+      self.file.seek(0)
+      return None
+      
+    data = " ".join(data)
+    
+    if mode.upper()=="R": return read()
+    elif mode.upper()=="W": return write(data=data)
+
+    
+
+
+    
+
 class Folder:
   def __init__(self, foldername, parent=None):
     self.foldername = foldername
-    self.subFolders = []
-    self.files = []
+    self.subFolders : list[Folder] = []
+    self.files : list[File] = []
     self.parent = parent
     if parent!=None:
       parent.subFolders.append(self)
@@ -46,7 +69,7 @@ class Folder:
           self.subFolders.remove(folder)
           print(filename + " has been deleted!")
           return True
-    #Not a folder could be a file
+  
     for file in self.files:
       if file.filename == filename:
           self.files.remove(file)
@@ -62,7 +85,7 @@ class Folder:
           folder.foldername = newname
           print(filename + " has been renamed!")
           return True
-    #Not a subfolder could be a file...
+    
     for file in self.files:
       if file.filename == filename:
           file.filename = newname
@@ -107,34 +130,19 @@ def cls():
   os.system('cls' if os.name == "nt" else "clear")
 
 root = Folder("./")
-myDocuments = root.mkdir("myDocuments")
-myPictures = root.mkdir("myPictures")
-myVideos = root.mkdir("myVideos")
-maths = myDocuments.mkdir("Maths")
-computerscience = myDocuments.mkdir("ComputerScience")
-english = myDocuments.mkdir("English")
-photos = myPictures.mkdir("Photos")
-cartoons = myPictures.mkdir("Cartoons")
-file1 = myDocuments.newFile("timetable.doc")
-file2 = photos.newFile("sea.jpg")
-file3 = photos.newFile("house.jpg")
-file4 = photos.newFile("cat.jpg")
-file5 = cartoons.newFile("mickey.png")
-file6 = cartoons.newFile("bugs-bunny.png")
-file7 = english.newFile("essay.doc")
-file5 = computerscience.newFile("hello-world.py")
-file7 = computerscience.newFile("space-invader.py")
-file8 = computerscience.newFile("pacman.py")
-file9 = maths.newFile("primary-numbers.txt")
+Documents = root.mkdir("Documents")
+Pictures = root.mkdir("Pictures")
+Videos = root.mkdir("Videos")
+Music = root.mkdir("Music")
 cls()
 
-#Start DOS Emulator!
+
 currentFolder= root
 currentFolder.dir()
 
 while True:
   print("Type HELP to view list of instructions...")
-  instruction = input("?").split(" ")
+  instruction = input("$ ").split(" ")
   if instruction[0].upper()=="EXIT":
     print("Good bye!")
     break
@@ -174,9 +182,36 @@ while True:
       print("You must specify a folder name when using the MKDIR instruction.")
     else:  
       foldername = instruction[1]
-      currentFolder.mkdir(foldername)    
+      currentFolder.mkdir(foldername) 
+
+  elif instruction[0].upper()=="MKFILE":
+    if len(instruction)<2:
+         print("You must specify a folder name when using the MKFILE instruction.")
+    else:
+      filename = instruction[1]
+      currentFolder.newFile(filename)
+
+  elif instruction[0].upper()=="OPEN":
+    if len(instruction)<2:
+      print("You must specify a folder name when using the OPEN instruction.")
+
+    else:
+      filename = instruction[1]
+      mode = instruction[2]
+      other = instruction
       
+      for x in range(3):
+        del other[0]
+      for file in root.files:
+        if file.filename == filename:
+          output = file.open(mode,other)
+          if output is not None:
+            print(output)
+          
   else:
     print("Invalid Instruction... Type a valid isntruction or HELP for a full list of instructions.")
+
+
+
 
       
