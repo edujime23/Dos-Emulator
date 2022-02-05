@@ -141,7 +141,6 @@ currentFolder= root
 currentFolder.dir()
 
 while True:
-  print("Type HELP to view list of instructions...")
   instruction = input("$ ").split(" ")
   if instruction[0].upper()=="EXIT":
     print("Good bye!")
