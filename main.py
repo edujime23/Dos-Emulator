@@ -144,8 +144,13 @@ cls()
 currentFolder= root
 currentFolder.dir()
 
+print("-----------------------------")
+print("Dos-Emulator")
+print("type HELP to see all commands")
+print("-----------------------------")
+
 while True:
-  instruction = input("$ ").split(" ")
+  instruction = input(f"root@{os.environ.get('USERNAME')}\n$ ").split(" ")
   if instruction[0].upper()=="EXIT":
     print("Good bye!")
     break
