@@ -227,7 +227,7 @@ print("Dos-Emulator")
 print("type HELP to see all commands")
 print("-----------------------------")
 
-currentFolder= root
+currentFolder = root
 currentFolder.dir()   
 
 while True:
@@ -329,9 +329,4 @@ while True:
   print("\n")
 
 
-exit()
-
-
-
-
-      
+exit()   
