@@ -118,9 +118,11 @@ def help():
   print("CD foldername - To navigate to a subfolder.")
   print("CD .. - To navigate to the parent folder.")
   print("MKDIR foldername - To create a subfolder.")
+  print("MKFILE filename - To create a file")
   print("RENAME name newname - To rename a subfolder or a file.")
   print("DEL name - To delete a subfolder or a file.")
   print("EXIT - Quit.")
+  print("OPEN filename mode - To open a file and write or read data")
   print(" ---------------------------------------")
   print()
   
