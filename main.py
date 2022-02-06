@@ -132,8 +132,11 @@ def cls():
 
 root = Folder("./")
 Documents = root.mkdir("Documents")
+cls()
 Pictures = root.mkdir("Pictures")
+cls()
 Videos = root.mkdir("Videos")
+cls()
 Music = root.mkdir("Music")
 cls()
 
