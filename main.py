@@ -1,3 +1,4 @@
+from ast import Str
 import io
 import os
 from asyncio import get_event_loop
@@ -6,37 +7,7 @@ from aiohttp import ClientSession, ClientConnectionError
 from functools import wraps
 from inspect import isasyncgenfunction, iscoroutinefunction
 
-class Cache(object):
-    def __init__(self) -> None:
-        self.cache = {}
-        super().__init__()
-    
-    
-    def add_cache(self, title : str, data):
-        assert title is not None
-        assert data is not None
-        assert title not in self.cache
-
-        self.cache[title] = data
-
-        return None
-
-    def get_cahce(self, Id : str):
-        assert Id in self.cache
-        data = self.cache[Id]
-        return data
-    
-    def __del__(self):
-        self.cache = {}
-        del self.cache
-        
-    
-
-
-__cache__ = Cache()
-        
-
- 
+subdirs = []
 
 def cache(maxsize=128):
     cache = {}
@@ -65,10 +36,7 @@ def cache(maxsize=128):
                 del cache[list(cache.keys())[0]]
                 cache[key] = res
 
-            __cache__.add_cache(res,key)
-               
-                
-            return res
+            return any
 
         return inner
 
@@ -160,6 +128,7 @@ class Folder:
         print("This subfolder already exists!")
         return False
     subFolder = Folder(foldername, self)
+    subdirs.append(subFolder)
     print("New Subfolder created!")
     return subFolder
     
@@ -236,6 +205,7 @@ def help():
   print("EXIT - Quit.")
   print("OPEN filename mode - To open a file and write or read data")
   print("REQUEST url method res_method - To make a HTTP request")
+  print("CALC operation - To get the result of operations")
   print(" ---------------------------------------")
   
 # A function to clear the screen  
@@ -258,7 +228,7 @@ print("type HELP to see all commands")
 print("-----------------------------")
 
 currentFolder= root
-currentFolder.dir()
+currentFolder.dir()   
 
 while True:
   instruction = input(f"root@{os.environ.get('USERNAME')}\n$ ").split(" ")
@@ -334,19 +304,30 @@ while True:
     url = instruction[1]
     method = instruction[2]
     res_method = instruction[3]
+    loop = get_event_loop()
     try:
-      if method.upper()=="GET": print(get(url, res_method=res_method))
-      elif method.upper()=="PUT": print(put(url, res_method=res_method))
-      elif method.upper()=="POST": print(post(url, res_method=res_method))
-      elif method.upper()=="DELETE": print(delete(url, res_method=res_method))
-      elif method.upper()=="PATCH": print(patch(url, res_method=res_method))
+      if method.upper()=="GET": print(loop.run_until_complete(get(url, res_method=res_method)))
+      elif method.upper()=="PUT": print(loop.run_until_complete(put(url, res_method=res_method)))
+      elif method.upper()=="POST": print(loop.run_until_complete(post(url, res_method=res_method)))
+      elif method.upper()=="DELETE": print(loop.run_until_complete(delete(url, res_method=res_method)))
+      elif method.upper()=="PATCH": print(loop.run_until_complete(patch(url, res_method=res_method)))
       else: print({"Invalif METHOD": "AVABLE METHODS:GET, PUT, DELETE, POST, PATCH"})
     except:
       raise ClientConnectionError("Can't connect to the url") 
+
+  elif instruction[0].upper()=="CALC":
+    operation = instruction
+    del operation[0]
+    operation = eval(operation[0])
+    print(f"{operation}")
+    
+
+    
     
   else:
     print("Invalid Instruction... Type a valid isntruction or HELP for a full list of instructions.")
   print("\n")
+
 
 exit()
 
