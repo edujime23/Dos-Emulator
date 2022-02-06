@@ -1,6 +1,118 @@
 import io
 import os
+from asyncio import get_event_loop
+from aiohttp import ClientSession
+from functools import wraps
+from inspect import isasyncgenfunction, iscoroutinefunction
 
+class Cache(object):
+    def __init__(self) -> None:
+        self.cache = {}
+        super().__init__()
+    
+    
+    def add_cache(self, title : str, data):
+        assert title is not None
+        assert data is not None
+        assert title not in self.cache
+
+        self.cache[title] = data
+
+        return None
+
+    def get_cahce(self, Id : str):
+        assert Id in self.cache
+        data = self.cache[Id]
+        return data
+    
+    def __del__(self):
+        self.cache = {}
+        del self.cache
+        
+    
+
+
+__cache__ = Cache()
+        
+
+ 
+
+def cache(maxsize=128):
+    cache = {}
+    
+    def decorator(func):
+        @wraps(func)
+        async def inner(*args, no_cache=False, **kwargs):
+            if no_cache:
+                if iscoroutinefunction(func) or isasyncgenfunction(func):
+                    return await func(*args, **kwargs)
+                elif not iscoroutinefunction(func) and not isasyncgenfunction(func):
+                    return func(*args, **kwargs)
+
+            key_base = "_".join(str(x) for x in args)
+            key_end = "_".join(f"{k}:{v}" for k, v in kwargs.items())
+            key = f"{key_base}-{key_end}"
+
+            if key in cache:
+                return cache[key]
+            if iscoroutinefunction(func) or isasyncgenfunction(func):
+                res = await func(*args, **kwargs)
+            elif not iscoroutinefunction(func) and not isasyncgenfunction(func):
+                res = func(*args, **kwargs)
+
+            if len(cache) > maxsize:
+                del cache[list(cache.keys())[0]]
+                cache[key] = res
+
+            __cache__.add_cache(res,key)
+               
+                
+            return res
+
+        return inner
+
+    return decorator
+
+class HTTPSession(ClientSession):
+    """ Abstract class for aiohttp. """
+    
+    def __init__(self, loop=None) -> None:
+        super().__init__(loop=loop or get_event_loop())
+
+    def __del__(self) -> None:
+        if not self.closed:
+            self.loop.run_until_complete(self.close())
+            self.loop.close()
+ 
+
+        return 
+       
+
+            
+
+session = HTTPSession()
+
+@cache()
+async def query(url, method="get", res_method="text", *args, **kwargs):
+    async with getattr(session, method.lower())(url, *args, **kwargs) as res:
+        return await getattr(res, res_method)()
+
+
+async def get(url, *args, **kwargs):
+    return await query(url, "get", *args, **kwargs)
+ 
+
+async def post(url, *args, **kwargs):
+    return await query(url, "post", *args, **kwargs)
+
+async def delete(url, *args, **kwargs):
+    return await query(url, "delete", *args, **kwargs)
+
+async def patch(url, *args, **kwargs):
+    return await query(url, "patch", *args, **kwargs)
+
+async def put(url, *args, **kwargs):
+    return await query(url, "put", *args, **kwargs)
 class File:
   def __init__(self, filename, parent):
     self.filename = filename
@@ -216,6 +328,17 @@ while True:
           if output is not None:
             print(output)
           
+  elif instruction[0].upper()=="REQUEST":
+    url = instruction[1]
+    method = instruction[2]
+    res_method = instruction[3]
+
+    if method.upper()=="GET": get(url, res_method=res_method)
+    elif method.upper()=="PUT": put(url, res_method=res_method)
+    elif method.upper()=="POST": post(url, res_method=res_method)
+    elif method.upper()=="DELETE": delete(url, res_method=res_method)
+    elif method.upper()=="PATCH": patch(url, res_method=res_method)
+    
   else:
     print("Invalid Instruction... Type a valid isntruction or HELP for a full list of instructions.")
 
