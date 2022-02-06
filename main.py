@@ -81,10 +81,9 @@ class HTTPSession(ClientSession):
 
     def __del__(self) -> None:
         if not self.closed:
-            self.loop.run_until_complete(self.close())
-            self.loop.close()
- 
-
+          loop = get_event_loop()
+          loop.run_until_complete(self.close())
+          loop.close()
         return 
        
 
@@ -237,7 +236,6 @@ def help():
   print("OPEN filename mode - To open a file and write or read data")
   print("REQUEST url method res_method - To make a HTTP request")
   print(" ---------------------------------------")
-  print()
   
 # A function to clear the screen  
 def cls():
@@ -264,7 +262,9 @@ currentFolder.dir()
 while True:
   instruction = input(f"root@{os.environ.get('USERNAME')}\n$ ").split(" ")
   if instruction[0].upper()=="EXIT":
+    if not session.closed: session.close().close()
     print("Good bye!")
+    cls()
     break
   
   elif instruction[0].upper()=="HELP":
@@ -345,6 +345,8 @@ while True:
   else:
     print("Invalid Instruction... Type a valid isntruction or HELP for a full list of instructions.")
   print("\n")
+
+exit()
 
 
 
