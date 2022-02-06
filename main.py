@@ -1,7 +1,7 @@
 import io
 import os
 from asyncio import get_event_loop
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientConnectionError
 from functools import wraps
 from inspect import isasyncgenfunction, iscoroutinefunction
 
@@ -235,6 +235,7 @@ def help():
   print("DEL name - To delete a subfolder or a file.")
   print("EXIT - Quit.")
   print("OPEN filename mode - To open a file and write or read data")
+  print("REQUEST url method res_method - To make a HTTP request")
   print(" ---------------------------------------")
   print()
   
@@ -332,15 +333,19 @@ while True:
     url = instruction[1]
     method = instruction[2]
     res_method = instruction[3]
-
-    if method.upper()=="GET": get(url, res_method=res_method)
-    elif method.upper()=="PUT": put(url, res_method=res_method)
-    elif method.upper()=="POST": post(url, res_method=res_method)
-    elif method.upper()=="DELETE": delete(url, res_method=res_method)
-    elif method.upper()=="PATCH": patch(url, res_method=res_method)
+    try:
+      if method.upper()=="GET": print(get(url, res_method=res_method))
+      elif method.upper()=="PUT": print(put(url, res_method=res_method))
+      elif method.upper()=="POST": print(post(url, res_method=res_method))
+      elif method.upper()=="DELETE": print(delete(url, res_method=res_method))
+      elif method.upper()=="PATCH": print(patch(url, res_method=res_method))
+      else: print({"Invalif METHOD": "AVABLE METHODS:GET, PUT, DELETE, POST, PATCH"})
+    except:
+      raise ClientConnectionError("Can't connect to the url") 
     
   else:
     print("Invalid Instruction... Type a valid isntruction or HELP for a full list of instructions.")
+  print("\n")
 
 
 
