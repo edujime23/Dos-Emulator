@@ -253,14 +253,13 @@ cls()
 Music = root.mkdir("Music")
 cls()
 
-
-currentFolder= root
-currentFolder.dir()
-
 print("-----------------------------")
 print("Dos-Emulator")
 print("type HELP to see all commands")
 print("-----------------------------")
+
+currentFolder= root
+currentFolder.dir()
 
 while True:
   instruction = input(f"root@{os.environ.get('USERNAME')}\n$ ").split(" ")
