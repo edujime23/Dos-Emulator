@@ -1,6 +1,7 @@
 import io
 import os
 from asyncio import get_event_loop
+from time import sleep
 from aiohttp import ClientSession, ClientConnectionError
 from functools import wraps
 from inspect import isasyncgenfunction, iscoroutinefunction
@@ -264,6 +265,7 @@ while True:
   if instruction[0].upper()=="EXIT":
     if not session.closed: session.close().close()
     print("Good bye!")
+    sleep(2)
     cls()
     break
   
