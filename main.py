@@ -1,7 +1,6 @@
-
 import io
 import os
-import typing
+
 class File:
   def __init__(self, filename, parent):
     self.filename = filename
