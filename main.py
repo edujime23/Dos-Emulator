@@ -1,4 +1,3 @@
-from ast import Str
 import io
 import os
 from asyncio import get_event_loop
@@ -96,11 +95,15 @@ class File:
       self.file.write(data)
       self.file.seek(0)
       return None
-      
+
+    def delete():
+      self.file = io.TextIOWrapper(io.BytesIO(),"utf-8")
+
     data = " ".join(data)
     
-    if mode.upper()=="R": return read()
-    elif mode.upper()=="W": return write(data=data)
+    if mode.upper()=="R" or mode.upper()=="-R": return read()
+    elif mode.upper()=="W" or mode.upper()=="-W": return write(data=data)
+    elif mode.upper()=="D" or mode.upper()=="-D": return delete()
 
     
 
@@ -329,4 +332,4 @@ while True:
   print("\n")
 
 
-exit()   
+exit()     
